@@ -1,0 +1,46 @@
+// .vscode/launch.json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Docmancer: Debug External Project",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/docmancer/__main__.py",
+            "args": [
+                "--generate",
+                "--no-summary"
+            ],
+            "cwd": "${workspaceFolder}/tests/test_projects/sample_project_1", // Set CWD to the external project
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "env": {
+                // Add any necessary environment variables for the external project,
+                // e.g., if MyTestProject's code needs specific ENV vars.
+            }
+        },
+        {
+            "name": "Debug: pytest current file",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": [
+                "${file}"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Python: Current File (with Poetry env)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}",
+            "env": {
+
+            }
+        }
+    ]
+}

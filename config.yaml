@@ -1,0 +1,98 @@
+# config.yaml
+#
+# This is the primary configuration file for Docmancer.
+# You can customize LLM behavior, input/output paths, and other settings here.
+#
+# For more details, refer to the Docmancer documentation.
+
+# === General Docmancer Settings ===
+# Default style for documentation generation if not specified via CLI.
+style: basic
+language: "python"
+
+# Files and functions to include during processing
+# Use glob patterns for files/directories.
+files:
+  - "src/**/*.py"
+
+functions:
+  - "*"
+
+# Files and functions to ignore during scanning/processing
+# Use glob patterns for files/directories.
+ignore_files:
+  - "**/test_*.py"       # Ignore all test files
+  - "**/__init__.py"     # Ignore __init__.py files
+  - "docs/"               # Ignore an entire documentation directory
+  - ".git/"               # Ignore git directory
+
+# Specific function names to ignore for documentation generation.
+ignore_functions:
+  - "main"                # Often a simple entry point
+  - "_private_helper_func" # Ignore functions with private conventions
+
+# === LLM Specific Configuration ===
+llm_config:
+  # === LLM Mode Configuration ===
+  # Defines how Docmancer will interact with the Large Language Model summary generator.
+  # Options:
+  #   - LOCAL: Uses a .gguf model file run directly on your machine via llama-cpp-python.
+  #            Ideal for performance, privacy, and no token costs.
+  #   - REMOTE_API: Connects to a web-based LLM API (e.g., OpenAI, Anthropic, or a custom server).
+  #            Requires network access and potentially an API key.
+  mode: LOCAL # Default mode for easy local development without API keys
+
+  # === Common LLM Settings (apply to all modes) ===
+  temperature: 0.5          # Model creativity (0.0 = deterministic, 1.0 = highly creative)
+  max_tokens_per_response: 2048 # Maximum number of tokens the LLM will generate in its response
+
+  # === Mode-Specific Settings ===
+  # LOCAL mode settings (active when mode: LOCAL)
+  # Ensure you have a .gguf model file downloaded and specify its path.
+  local:
+    model_path: !ENV DOCMANCER_MODEL_PATH # Recommended: put models in a location outside the project since they can be larger.
+    n_gpu_layers: -1       # Number of layers to offload to GPU (-1 for all). Set to 0 for CPU only.
+    n_ctx: 4096            # Context window size (tokens). Must match model's context or be lower.
+    n_batch: 512           # Batch size for prompt processing. Adjust for performance.
+    # n_threads: 4         # Optional: Number of threads to use for LLM inference (default is logical cores)
+    # main_gpu: 0          # Optional: The GPU to use for llama.cpp (0 is typically the first GPU)
+
+  # REMOTE_API mode settings (active when mode: REMOTE_API)
+  # Uncomment and configure this section if you want to use a web-based LLM.
+  # remote_api:
+    # base_url: "https://api.openai.com/v1" # Example: OpenAI API endpoint
+    # base_url: "https://api.anthropic.com/v1" # Example: Anthropic API endpoint
+    # base_url: "http://localhost:11434/api" # Example: Ollama local server
+    # base_url: "http://my-company-ai.com/api" # Example: Custom internal server
+    # model_name: "gpt-4o"                  # The specific model identifier for the chosen API
+    # model_name: "claude-3-opus-20240229"
+    # model_name: "llama3:8b-instruct" # For Ollama
+
+    # API Key Configuration:
+    # Recommended: Use an environment variable for security.
+    # Docmancer will look for a variable with this name.
+    # Example: export OPENAI_API_KEY="sk-..." in your shell.
+    # api_key_env_var: "OPENAI_API_KEY"
+    # api_key_env_var: "ANTHROPIC_API_KEY"
+    # api_key_env_var: ~ # Set to ~ (null) if no API key is required (e.g., some internal servers)
+
+    # Cost and Token Tracking:
+    # Set to 'true' to enable pre-run token estimation and enforce user-defined limits.
+    # Set to 'false' if you don't need cost control (e.g., free tier, internal server).
+    # track_tokens_and_cost: true
+
+    # Only relevant if track_tokens_and_cost is true:
+    # Maximum total tokens allowed for the prompt (input) for a single LLM call.
+    # If a prompt exceeds this limit, Docmancer will warn or exit.
+    # user_max_prompt_tokens: 8000
+
+# --- TODO: Other Global Settings ---
+# - output directories
+# - logging levels
+# output_settings:
+#   output_directory: "./docs_output"
+#   overwrite_existing: false
+# - chaching and project indexing for performance and better context in prompts
+# logging_settings:
+#   level: "INFO" # DEBUG, INFO, WARNING
+#   log_file: "docmancer.log"
