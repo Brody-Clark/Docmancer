@@ -13,6 +13,7 @@ def factorial(n: int) -> int:
         result *= i
     return result
 
+
 class Calculator:
 
     def __init__(self, initial_value: float = 0.0):

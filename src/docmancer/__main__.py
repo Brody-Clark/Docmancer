@@ -30,7 +30,7 @@ def main():
                 raise ValueError(
                     "Config error: 'local' settings missing for LOCAL mode."
                 )
-            local_settings = llm_config.local 
+            local_settings = llm_config.local
             print(f"  Model Path: {local_settings.model_path}")
             print(f"  GPU Layers: {local_settings.n_gpu_layers}")
             # Use these settings to initialize your local LLM agent
