@@ -1,7 +1,7 @@
-<h1 align="center">Docmancer</h1><h2 align="center"> Documentation Generator Engine</h2>
+<h1 align="center">Docmancer</h1><h2 align="center"> Documentation Generation Engine</h2>
 
 <p align="center">
-Languages:
+Supported Languages:
   <em>
     Python
   </em>
@@ -9,7 +9,7 @@ Languages:
 
 ## Intro
 
-Docmancer is a source code documentation engine. It creates documentation strings for specified files and functions and can insert them directly into your source code. It uses local or web-based LLM models to construct documentation and can generate it in several different formats.
+Docmancer is a source code documentation generation engine that uses a user-provided Large Language Model to generate docstring summaries for in-code documentation.
 
 ### Example Usage
 

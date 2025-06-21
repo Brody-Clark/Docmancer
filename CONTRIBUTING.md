@@ -2,7 +2,7 @@
 
 ## Getting Started
 
-We use [Poetry]([Poetry](https://github.com/python-poetry/poetry)) for dependency management and virtual environments.
+This project uses [Poetry]([Poetry](https://github.com/python-poetry/poetry)) for dependency management and virtual environments.
 
 1. Clone the repository
 
@@ -25,7 +25,7 @@ We use [Poetry]([Poetry](https://github.com/python-poetry/poetry)) for dependenc
 
 ## Code Style & Formatting
 
-- We Follow [PEP 8](https://peps.python.org/pep-0008/) style guidelines
+- This project follows [PEP 8](https://peps.python.org/pep-0008/) style guidelines
 - All code should be formatted using [black](https://github.com/psf/black).
 - Run the formatter prior to commits:
 
@@ -35,7 +35,7 @@ We use [Poetry]([Poetry](https://github.com/python-poetry/poetry)) for dependenc
 
 ## Docstring Guidelines
 
-We follow [PEP 257-style](https://peps.python.org/pep-0257/) docstrings with an emphasis on clarity and brevity.
+This project follows [PEP 257-style](https://peps.python.org/pep-0257/) docstrings with an emphasis on clarity and brevity.
 
 ### Where to Add Docstrings
 
@@ -64,7 +64,7 @@ def normalize_data(data: List[float]) -> List[float]:
 
 ## Unit Testing
 
-We use [pytest](https://docs.pytest.org/en/stable/) for all unit testing.
+This project uses [pytest](https://docs.pytest.org/en/stable/) for all unit testing.
 
 ### Test Directory Structure
 
