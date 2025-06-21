@@ -13,9 +13,10 @@ Docmancer is a source code documentation generation engine that uses a user-prov
 
 ### Example Usage
 
-#### Original function
+#### Original function (no docstring)
 
 ```py
+# example_script.py
 def calculate_rectangle_area(length, width, unit="meters"):
   if length < 0 or width < 0:
     raise ValueError("Length and width must be non-negative.")
@@ -25,10 +26,10 @@ def calculate_rectangle_area(length, width, unit="meters"):
 #### Input
 
 ```bash
-docmancer apply --file my_script.py --function claculate_rectangle_area --style "PEP" --Force True
+docmancer --write --file example_script.py --function claculate_rectangle_area --style "PEP"
 ```
 
-#### Output
+#### Output (with generated docstring)
 
 ```py
 def calculate_rectangle_area(length, width, unit="meters"):
