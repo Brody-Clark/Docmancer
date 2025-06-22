@@ -66,7 +66,7 @@ class DocumentationBuilderEngine:
                 else:
                     doc_model_database[file_path] = [doc]
 
-        # Step 4. Present the user with generated docs and get approval if "force" is not present
+        # Step 4. Present the user with generated docs and get approval if "force-all" is not present
         if not settings.force_all:
             for file_path, doc_models in doc_model_database.copy().items():
                 approved_docs = []
