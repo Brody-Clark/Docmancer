@@ -162,7 +162,7 @@ def parse_args() -> DocmancerConfig:
         help="Style of generated documentation",
     )
     parser.add_argument(
-        "--generate",
+        "--write",
         action="store_true",
         default=argparse.SUPPRESS,
         help="Writes doc strings to specified files and functions",

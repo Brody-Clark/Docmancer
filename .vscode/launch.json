@@ -8,7 +8,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/src/docmancer/__main__.py",
             "args": [
-                "--generate",
+                "--write",
                 "--no-summary"
             ],
             "cwd": "${workspaceFolder}/tests/test_projects/sample_project_1", // Set CWD to the external project

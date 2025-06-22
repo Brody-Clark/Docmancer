@@ -78,7 +78,7 @@ class DocmancerConfig:
     ignore_functions: List[str] = field(default_factory=list)
     no_summary: bool = False
     check: bool = False
-    generate: bool = True
+    write: bool = True
     force_all: bool = False
 
     def get_default_style_enum(self) -> DocstringStyle:
