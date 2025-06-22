@@ -58,8 +58,8 @@ def calculate_rectangle_area(length, width, unit="meters"):
 
 **[Documentation](docs/)**
 
-[Install](docs/Install) ·
-[Configuration](docs/Configuration)
+[Install](docs/Install.md) ·
+[Configuration](docs/Configuration.md)
 
 ---
 
