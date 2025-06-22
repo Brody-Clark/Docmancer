@@ -4,10 +4,12 @@
 
 - Python 3.8+
 - Poetry (for dependency and environment management)
-Install Poetry if you haven;t already:
-    ```bash
-    curl -sSL https://install.python-poetry.org | python3 -
-    ```
+
+Install Poetry if you haven't already:
+```bash
+curl -sSL https://install.python-poetry.org | python3 -
+```
+
 > [!NOTE]
 > After installation, restart your terminal or run source $HOME/.poetry/env.
 
@@ -18,7 +20,7 @@ Install Poetry if you haven;t already:
     git clone https://github.com/brody-clark/docmancer.git
     cd docmancer
     ```
-2. Install dependencies
+2. Install Dependencies
     ```bash
     poetry install
     ```
