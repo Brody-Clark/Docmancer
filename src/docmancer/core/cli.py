@@ -139,7 +139,7 @@ def parse_args() -> DocmancerConfig:
         help="Function names or glob patterns to skip within speficied files (e.g., _test_*)",
     )
     parser.add_argument(
-        "--project_dir",
+        "--project-dir",
         type=str,
         nargs="?",  # Make it optional so it can be defaulted by config
         default=argparse.SUPPRESS,

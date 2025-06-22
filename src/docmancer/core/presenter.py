@@ -210,7 +210,6 @@ class Presenter:
             f"[grey69]Line:[/grey69] [cyan]{doc.start_line or 'unknown'}"
         )
         self._console.print(f"[grey69]Function:[/grey69] [grey]{doc.signature}")
-        # self._console.print(Rule(style="grey69"))
 
         if doc.existing_docstring:
             self._console.print("[grey69]Existing Docstring:")
