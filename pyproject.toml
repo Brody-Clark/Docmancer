@@ -5,7 +5,7 @@ description = "A Python CLI tool for automated documentation generation and inse
 authors = [
     {name = "Brody Clark",email = "brodyclark97@gmail.com"}
 ]
-license = {text = "MIT"}
+license = {text = "GNU"}
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -33,4 +33,4 @@ requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-docmancer = "docmancer.cli:main" # 'command_name = package.module:function'
+docmancer = "docmancer.__main__:main" # 'command_name = package.module:function'

@@ -219,7 +219,7 @@ def parse_args() -> DocmancerConfig:
     # Parse arguments after defaults are set
     args = parser.parse_args()
     app_config = vars(args)
-
+    
     # Dictionary representation of defaults
     config = DocmancerConfig().to_dict()
 
