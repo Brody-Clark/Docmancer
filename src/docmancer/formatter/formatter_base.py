@@ -12,11 +12,5 @@ class FormatterBase(ABC):
         func_summary: FunctionSummaryModel,
         file_path: str,
     ) -> DocumentationModel:
-        """_summary_
-
-        Args:
-            doc_mode (DocumentationModel): _description_
-
-        Returns:
-            str: _description_
-        """
+        pass
+    
