@@ -1,92 +1,29 @@
+from typing import List
 import tree_sitter_python as tspython
-import tree_sitter_cpp as tscpp
 from tree_sitter import Language, Parser
 from docmancer.parser.base_parser import BaseParser
 from docmancer.models.function_context import FunctionContextModel
-import docmancer.utils.file_utils as fu
-from typing import List
-import os
-from pathlib import Path
-import fnmatch
 
 
 class PythonParser(BaseParser):
     def __init__(self):
+        BaseParser.__init__(self)
         self._language = Language(tspython.language())
         self._parser = Parser(self._language)
-
-    def get_function_nodes(self, tree, source_code: bytes):
-        query_str = """
+        self._query_str = """
         (
         function_definition
             name: (identifier) @func.name
         )
         """
-        query = self._language.query(query_str)
 
-        captures = query.captures(tree.root_node)
-        return captures
-
-    def get_function_names(self, captures, source_code: bytes) -> dict:
-        func_nodes = {}
-        for capture_name in captures:
-            if capture_name == "func.name":
-                for node in captures[capture_name]:
-                    func_name = source_code[node.start_byte : node.end_byte].decode(
-                        "utf-8"
-                    )
-                    func_nodes[node] = func_name
-        return func_nodes
-
-    def get_functions_by_name_pattern(
-        self, tree, source_code: bytes, glob_pattern: str
-    ) -> List[any]:
-        captures = self.get_function_nodes(tree, source_code)
-        matches = []
-        for node, func_name in self.get_function_names(
-            captures=captures, source_code=source_code
-        ).items():
-            if fnmatch.fnmatch(func_name, glob_pattern):
-                matches.append(node.parent)  # node.parent is the full function node
-
-        return matches
-
-    def parse(
-        self, file: str, function_patterns: List[str]
+    def extract_function_contexts(
+        self, root_node, source_code: str, module_name
     ) -> List[FunctionContextModel]:
-        # Parse all files and filter out function nodes based on filter glob patterns
-        functions = {}
-        function_nodes = set()
-        try:
-            code = fu.read_file_to_bytes(file.absolute())
-            module_name = os.path.splitext(os.path.basename(file.absolute()))[0]
-        except:
-            # TODO: log error
-            return None
-        tree = self._parser.parse(code)
-        for func_glob in function_patterns:
-            nodes = self.get_functions_by_name_pattern(tree, code, func_glob)
-            function_nodes.update(nodes)
-        functions[module_name] = function_nodes
-
-        # Parse each function root node and create function contexts
-        function_contexts = []
-        for name, function_nodes in functions.items():
-            for node in function_nodes:
-                function_contexts.append(
-                    self.extract_function_contexts(node, code, name)
-                )
-
-        return function_contexts
-
-    def get_node_text(self, node, source_code) -> str:
-        return source_code[node.start_byte : node.end_byte].decode("utf-8")
-
-    def extract_function_contexts(self, root_node, source_code: str, module_name):
         lines = source_code.splitlines()
 
         contexts = []
-        node_stack = [(root_node, [])]  # Each item: (node, scope_stack)
+        node_stack = [(root_node, [])]  # (node, scope_stack)
 
         while node_stack:
             node, scope = node_stack.pop()

@@ -1,0 +1,55 @@
+# config.yaml
+
+style: xml
+language: csharp
+files:
+  - "src/**/*.cs"
+functions:
+  - "*"
+
+ignore_files:
+  - "**/test_*.cs"     
+
+ignore_functions:
+  - "main"          
+
+llm_config:
+  mode: LOCAL # Default mode for easy local development without API keys
+
+  temperature: 0.5   
+  max_tokens_per_response: 2048 
+
+  local:
+    model_path: !ENV DOCMANCER_MODEL_PATH 
+    n_gpu_layers: -1      
+    n_ctx: 4096            
+    n_batch: 512           
+
+  # REMOTE_API mode settings (active when mode: REMOTE_API)
+  # Uncomment and configure this section if you want to use a web-based LLM.
+  # remote_api:
+    # base_url: "https://api.openai.com/v1" # Example: OpenAI API endpoint
+    # base_url: "https://api.anthropic.com/v1" # Example: Anthropic API endpoint
+    # base_url: "http://localhost:11434/api" # Example: Ollama local server
+    # base_url: "http://my-company-ai.com/api" # Example: Custom internal server
+    # model_name: "gpt-4o"                  # The specific model identifier for the chosen API
+    # model_name: "claude-3-opus-20240229"
+    # model_name: "llama3:8b-instruct" # For Ollama
+
+    # API Key Configuration:
+    # Recommended: Use an environment variable for security.
+    # Docmancer will look for a variable with this name.
+    # Example: export OPENAI_API_KEY="sk-..." in your shell.
+    # api_key_env_var: "OPENAI_API_KEY"
+    # api_key_env_var: "ANTHROPIC_API_KEY"
+    # api_key_env_var: ~ # Set to ~ (null) if no API key is required (e.g., some internal servers)
+
+    # Cost and Token Tracking:
+    # Set to 'true' to enable pre-run token estimation and enforce user-defined limits.
+    # Set to 'false' if you don't need cost control (e.g., free tier, internal server).
+    # track_tokens_and_cost: true
+
+    # Only relevant if track_tokens_and_cost is true:
+    # Maximum total tokens allowed for the prompt (input) for a single LLM call.
+    # If a prompt exceeds this limit, Docmancer will warn or exit.
+    # user_max_prompt_tokens: 8000

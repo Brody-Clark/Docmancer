@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class LLMAgent(ABC):
+class LlmAgentBase(ABC):
 
     @abstractmethod
     def send_message(self, message: str) -> str:

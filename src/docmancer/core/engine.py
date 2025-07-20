@@ -1,8 +1,8 @@
 from typing import List
 from docmancer.parser.base_parser import BaseParser
-from docmancer.generator.llm.llm_agent_factory import LLMAgentFactory
+from docmancer.generators.llm.llm_agent_factory import LLMAgentFactory
 from docmancer.models.function_summary import FunctionSummaryModel
-from docmancer.generator.documentation_generator import DocumentationGenerator
+from docmancer.generators.documentation_generators import LlmGenerator, DefaultGenerator
 from docmancer.formatter.formatter_base import FormatterBase
 from docmancer.core.presenter import Presenter, UserResponse
 from docmancer.models.documentation_model import DocumentationModel

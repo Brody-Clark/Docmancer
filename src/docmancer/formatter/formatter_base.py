@@ -12,5 +12,12 @@ class FormatterBase(ABC):
         func_summary: FunctionSummaryModel,
         file_path: str,
     ) -> DocumentationModel:
-        pass
-    
+        """
+        Creates a formatted documentation model that can be used to write a docstring into a source file.
+
+        Args:
+            doc_model: Generated documentation response model object
+
+        Returns:
+            A formatted Python docstring string.
+        """

@@ -7,7 +7,7 @@ import docmancer.utils.file_utils as fu
 INDENT_SPACES = 4
 
 
-class PyDocstringFormatter(FormatterBase):
+class pythonPepFormatter(FormatterBase):
 
     def get_formatted_documentation(
         self,
@@ -15,15 +15,7 @@ class PyDocstringFormatter(FormatterBase):
         func_summary: FunctionSummaryModel,
         file_path: str,
     ) -> DocumentationModel:
-        """
-        Formats a Python docstring for a function.
 
-        Args:
-            doc_model: Generated documentation response model object
-
-        Returns:
-            A formatted Python docstring string.
-        """
         function_signature_offset = fu.get_line_text_offset_spaces(
             file_path, func_context.start_line
         )

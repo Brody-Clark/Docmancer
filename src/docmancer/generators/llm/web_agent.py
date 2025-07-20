@@ -1,10 +1,10 @@
 import httpx
 from typing import Dict, Any, List, Optional, Union
 import json
-from docmancer.generator.llm.llm_agent_base import LLMAgent
+from docmancer.generators.llm.llm_agent_base import LlmAgentBase
 
 
-class WebAgent(LLMAgent):
+class WebAgent(LlmAgentBase):
     def __init__(self, api_endpoint: str, api_key: Optional[str] = None):
         """
         Initializes the WebAgent with the LLM API endpoint and an optional API key.

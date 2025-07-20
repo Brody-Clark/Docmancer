@@ -8,10 +8,7 @@ class Languages(Enum):
     """
 
     PYTHON = "python"
-    CPP = "cpp"
     CSHARP = "csharp"
-    JAVA = "java"
-    JAVASCRIPT = "javascript"
 
     def lower(self) -> str:
         return self.value.lower()

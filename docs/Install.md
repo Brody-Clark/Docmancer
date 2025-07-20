@@ -10,9 +10,6 @@ Install Poetry if you haven't already:
 pip install poetry
 ```
 
-> [!NOTE]
-> After installation, restart your terminal or run source $HOME/.poetry/env.
-
 ## Installation Steps
 
 1. Clone the Repository

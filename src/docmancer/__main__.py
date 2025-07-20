@@ -2,8 +2,8 @@ import os
 import sys
 from docmancer.core.cli import parse_args
 from docmancer.core.engine import DocumentationBuilderEngine
-from docmancer.generator.documentation_generator import DocumentationGenerator
-from docmancer.generator.llm.llm_agent_factory import LLMAgentFactory
+from docmancer.generators.documentation_generators import DocumentationGenerator
+from docmancer.generators.llm.llm_agent_factory import LLMAgentFactory
 from docmancer.formatter.formatter_factory import FormatterFactory
 from docmancer.core.presenter import Presenter
 from docmancer.parser.parser_factory import ParserFactory
@@ -17,9 +17,9 @@ def main():
 
     try:
 
-        # --- Accessing config settings ---
-        llm_config = config.llm_config  # Direct attribute access!
-        llm_mode_enum = llm_config.get_mode_enum()  # Get the type-safe Enum member
+        # Accessing config settings
+        llm_config = config.llm_config
+        llm_mode_enum = llm_config.get_mode_enum()
 
         print(f"\nLLM Mode: {llm_mode_enum.value} (Enum: {llm_mode_enum.name})")
         print(f"  Temperature: {llm_config.temperature}")
@@ -33,7 +33,7 @@ def main():
             local_settings = llm_config.local
             print(f"  Model Path: {local_settings.model_path}")
             print(f"  GPU Layers: {local_settings.n_gpu_layers}")
-            # Use these settings to initialize your local LLM agent
+            # Use these settings to initialize the local LLM agent
             # llm_agent = LLMAgent(mode=llm_mode_enum, config=local_settings)
 
         elif llm_mode_enum == LLMType.REMOTE_API:

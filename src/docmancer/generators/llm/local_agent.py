@@ -1,9 +1,9 @@
 from llama_cpp import Llama
-from docmancer.generator.llm.llm_agent_base import LLMAgent
+from docmancer.generators.llm.llm_agent_base import LlmAgentBase
 from docmancer.config import LocalLLMSettings
 
 
-class LlamaCppAgent(LLMAgent):
+class LlamaCppAgent(LlmAgentBase):
     def __init__(self, settings: LocalLLMSettings):
         self._model_path = settings.model_path
         # TODO: initialize system here with other settings!

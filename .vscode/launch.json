@@ -10,7 +10,7 @@
             "args": [
                 "--write"
             ],
-            "cwd": "${workspaceFolder}/tests/test_projects/sample_project_1", // Set CWD to the external project
+            "cwd": "${workspaceFolder}/tests/test_projects/csharp", // Set CWD to the external project
             "console": "integratedTerminal",
             "justMyCode": true,
             "env": {

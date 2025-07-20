@@ -1,21 +1,20 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from docmancer.formatter.py_docstring_formatter import PyDocstringFormatter
+from docmancer.formatter.python_formatters import pythonPepFormatter
 from docmancer.models.function_context import FunctionContextModel
 from docmancer.models.function_summary import FunctionSummaryModel
 from docmancer.models.documentation_model import DocumentationModel
-import textwrap
 
 
 class TestPepFormatter(unittest.TestCase):
 
-    @patch("docmancer.formatter.py_docstring_formatter.fu.get_line_text_offset_spaces")
-    def test_get_formatted_docuemntation(self, mock_get_line_text_offset_spaces):
+    @patch("docmancer.formatter.python_formatters.fu.get_line_text_offset_spaces")
+    def test_get_formatted_documentation(self, mock_get_line_text_offset_spaces):
 
         # mock return 4 spaces (tab)
         mock_get_line_text_offset_spaces.return_value = 4
 
-        formatter = PyDocstringFormatter()
+        formatter = pythonPepFormatter()
         test_func_context = FunctionContextModel(
             qualified_name="test.class.func",
             signature="def func()",

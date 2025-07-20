@@ -1,0 +1,37 @@
+# prompt_template: |
+# This file defines the default prompt template used by Docmancer to instruct the LLM
+# on how to generate function documentation. The template supports Python's str.format()
+# placeholders (e.g., {signature}, {body}, {qualified_name}, etc.), which will be dynamically
+# replaced at runtime with information about the function being documented.
+#
+# To customize the prompt, you may edit the instructions, add or remove formatting, or
+# include/exclude placeholders as needed. Make sure to keep the placeholders wrapped in
+# curly braces so they can be replaced by Docmancer.
+#
+# Available placeholders include:
+#   {signature}           - The function signature
+#   {preceding_comments}  - Any comments immediately above the function
+#   {qualified_name}      - The fully qualified function name
+#   {body}                - The function's source code body
+#   {expected_json_format}- The required JSON output format for the LLM
+#
+# Save this file after editing. Docmancer will use your custom prompt for all LLM requests.
+
+prompt_template: |
+  Function Signature: {signature}
+  Preceding Comments: {preceding_comments}
+  Qualified Name: {qualified_name}
+  Function Body:
+  `
+  {body}
+  `
+  
+  Your task:
+  - Summarize what the function does.
+  - Optionally add any remarks or example usage if they would not be obvious to developers using the function.
+  - Describe what each parameter means in the context of the function if they exist. Ignore parameters if there are none.
+  - Omit details if the code is not clear enough to draw conclusions from. Do not rely entirely on function or variable names since they may be misleading.
+  - Describe the return value if it has one.
+  - Optionally describe any exceptions the function raises.
+  - Do not write an introduction or summary. Respond with only valid JSON and make sure it follows this format:
+  {expected_json_format}

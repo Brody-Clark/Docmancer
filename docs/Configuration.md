@@ -69,3 +69,4 @@ llm_config:
 > Support for more styles is ongoing
 
 - PEP
+- XML

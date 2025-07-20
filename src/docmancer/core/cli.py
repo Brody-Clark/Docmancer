@@ -195,9 +195,9 @@ def parse_args() -> DocmancerConfig:
     )
 
     parser.add_argument(
-        "--model-type",
+        "--llm_config_mode",
         type=str,
-        choices=["local", "web"],
+        choices=["local", "remote"],
         default=argparse.SUPPRESS,
         help="Set whether the generator model is local or web-based",
     )
@@ -210,7 +210,7 @@ def parse_args() -> DocmancerConfig:
     )
 
     parser.add_argument(
-        "--model-web-api",
+        "--model-remote-api",
         type=str,
         default=argparse.SUPPRESS,
         help="API endpoint for web-based model. Must include API key if required",
@@ -219,7 +219,7 @@ def parse_args() -> DocmancerConfig:
     # Parse arguments after defaults are set
     args = parser.parse_args()
     app_config = vars(args)
-    
+
     # Dictionary representation of defaults
     config = DocmancerConfig().to_dict()
 
@@ -245,6 +245,9 @@ def parse_args() -> DocmancerConfig:
     # Post-processing for boolean flags if we want config to override default.
     # For flags using action='store_true', their default is False.
     # If we want config to set them to True, we need to handle it after parsing.
+    if app_config.get("write") is None and app_config.get("check") is None:
+        parser.error("You must specify either --write or --check.")
+
     if (
         get_default(config, "force-all", False)
         and not parser.parse_known_args()[0].force_all
@@ -265,17 +268,17 @@ def parse_args() -> DocmancerConfig:
 
     # Some basic validation/coherence checks for model type
     if (
-        "model_type" in app_config
-        and app_config["model_type"] == "local"
+        "llm_config_mode" in app_config
+        and app_config["llm_config_mode"] == "local"
         and not app_config["model_local_path"]
     ):
-        parser.error("--model-local-filepath is required when --model-type is 'local'.")
+        parser.error("--model-local-path is required when --model-type is 'local'.")
     if (
-        "model_type" in app_config
-        and app_config["model_type"] == "web"
-        and not app_config["model_web_api"]
+        "llm_config_mode" in app_config
+        and app_config["llm_config_mode"] == "remote"
+        and not app_config["model_remote_api"]
     ):
-        parser.error("--model-web-api is required when --model-type is 'web'.")
+        parser.error("--model-remote-api is required when --model-type is 'remote'.")
 
     # If `project_dir` is not explicitly set, derive it from config file location
     # This logic assumes `project_dir` in config is the true project root
@@ -289,7 +292,5 @@ def parse_args() -> DocmancerConfig:
 
     # update config with args
     config.update(app_config)
-
-    # TODO: if no core function like generate, check, etc.. is given, throw an error
 
     return DocmancerConfig.from_dict(config)
