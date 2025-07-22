@@ -6,7 +6,7 @@ import docmancer.utils.file_utils as fu
 from docmancer.models.function_context import FunctionContextModel
 
 
-class BaseParser(ABC):
+class ParserBase(ABC):
     def __init__(self):
         self._language = None
         self._parser = None

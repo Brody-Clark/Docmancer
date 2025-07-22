@@ -20,9 +20,6 @@ class DocstringStyle(Enum):
 
 
 STYLE_DEFINITIONS: Dict[str, Dict[str, Any]] = {
-    DocstringStyle.GOOGLE.value: {
-        "description": "Google Style Guide docstring format."
-    },
     DocstringStyle.PEP.value: {
         "description": "PEP 257 docstring conventions (often reStructuredText-like)."
     },

@@ -24,6 +24,8 @@ class LocalLLMSettings:
     n_batch: int = 560
     n_threads: Optional[int] = None
     main_gpu: Optional[int] = None
+    temperature: float = 0.7
+    log_verbose: bool = False
 
 
 @dataclass_json

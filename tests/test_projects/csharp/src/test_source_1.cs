@@ -4,7 +4,8 @@ namespace SampleProject
 {
     public class MathUtils
     {
-        // Static function
+        // Multi-line
+        // Comment
         public static int Add(int a, int b)
         {
             return a + b;
@@ -19,7 +20,9 @@ namespace SampleProject
 
     public class Greeter
     {
-        // Static function
+        /*
+        * Other multi-line comment
+        */
         public static void SayHello()
         {
             Console.WriteLine("Hello, world!");
@@ -39,5 +42,11 @@ namespace SampleProject
         {
             Console.WriteLine("Version 1.0");
         }
+
+    }
+
+    public static Greeter GetGreeter()
+    {
+        return new Greeter();
     }
 }

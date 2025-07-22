@@ -1,13 +1,13 @@
 from typing import List
 import tree_sitter_python as tspython
 from tree_sitter import Language, Parser
-from docmancer.parser.base_parser import BaseParser
+from docmancer.parser.parser_base import ParserBase
 from docmancer.models.function_context import FunctionContextModel
 
 
-class PythonParser(BaseParser):
+class PythonParser(ParserBase):
     def __init__(self):
-        BaseParser.__init__(self)
+        ParserBase.__init__(self)
         self._language = Language(tspython.language())
         self._parser = Parser(self._language)
         self._query_str = """

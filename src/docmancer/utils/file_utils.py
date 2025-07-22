@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from typing import List
+import fnmatch
 
 
 def get_all_files_in_dir(dir_path):
@@ -21,14 +22,25 @@ def get_all_files_in_dir(dir_path):
     return files
 
 
-def get_files_by_pattern(pattern: str) -> List[Path]:
+def get_files_by_pattern(
+    start_dir: str, include_patterns: List[str], ignore_patterns: List[str]
+) -> List[Path]:
     """
     Return a list of Path objects matching the given glob pattern.
     Example patterns:
         "*.py" - all Python files in current dir
         "src/**/*.py" - all Python files recursively under src/
     """
-    return list(Path().glob(pattern))  # Non-recursive unless you use **
+    matches = []
+    for pattern in include_patterns:
+        found_files = Path(start_dir).glob(pattern=pattern)
+        for fn in found_files:
+            # skip functions that match any ignore patterns
+            if any(fnmatch.fnmatch(str(fn), pattern) for pattern in ignore_patterns):
+                continue
+        matches.append(fn)
+
+    return matches
 
 
 def get_line_text_offset_spaces(file_path: str, line: int) -> int:

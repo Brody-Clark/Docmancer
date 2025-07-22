@@ -2,8 +2,12 @@ import os
 import sys
 from docmancer.core.cli import parse_args
 from docmancer.core.engine import DocumentationBuilderEngine
-from docmancer.generators.documentation_generators import DocumentationGenerator
-from docmancer.generators.llm.llm_agent_factory import LLMAgentFactory
+from docmancer.generators.documentation_generators import (
+    GeneratorBase,
+    DefaultGenerator,
+    LlmGenerator,
+)
+from docmancer.generators.llm.llm_agent_factory import LlmFactory
 from docmancer.formatter.formatter_factory import FormatterFactory
 from docmancer.core.presenter import Presenter
 from docmancer.parser.parser_factory import ParserFactory
@@ -11,7 +15,7 @@ from docmancer.config import DocmancerConfig, LLMType
 
 
 def main():
-    config = parse_args()
+    config: DocmancerConfig = parse_args()
     if not os.path.isdir(config.project_dir):
         raise Exception("Error: Project directory does not exist.")
 
@@ -70,15 +74,17 @@ def main():
         print(f"An unexpected error occurred: {e}", file=sys.stderr)
         sys.exit(1)
 
-    try:
-        agent_factory = LLMAgentFactory()
-        agent = agent_factory.get_agent(llm_config=config.llm_config)
-    except Exception as e:
-        print(e)
-
     presenter = Presenter()
 
-    generator = DocumentationGenerator(model=agent, language=config.language)
+    if config.no_summary:
+        generator = DefaultGenerator()
+    else:
+        try:
+            agent_factory = LlmFactory()
+            agent = agent_factory.get_agent(llm_config=config.llm_config)
+        except Exception as e:
+            print(e)
+        generator = LlmGenerator(agent=agent)
 
     formatter_factory = FormatterFactory()
     formatter = formatter_factory.get_formatter(

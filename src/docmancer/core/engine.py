@@ -1,8 +1,7 @@
 from typing import List
-from docmancer.parser.base_parser import BaseParser
-from docmancer.generators.llm.llm_agent_factory import LLMAgentFactory
+from docmancer.parser.parser_base import ParserBase
 from docmancer.models.function_summary import FunctionSummaryModel
-from docmancer.generators.documentation_generators import LlmGenerator, DefaultGenerator
+from docmancer.generators.documentation_generators import GeneratorBase
 from docmancer.formatter.formatter_base import FormatterBase
 from docmancer.core.presenter import Presenter, UserResponse
 from docmancer.models.documentation_model import DocumentationModel
@@ -13,8 +12,8 @@ import docmancer.utils.file_utils as file_utils
 class DocumentationBuilderEngine:
     def __init__(
         self,
-        generator: DocumentationGenerator,
-        parser: BaseParser,
+        generator: GeneratorBase,
+        parser: ParserBase,
         presenter: Presenter,
         formatter: FormatterBase,
     ):
@@ -28,14 +27,17 @@ class DocumentationBuilderEngine:
 
         # Step 1. parse all files/functions into {file_path: List[function]} map
         file_contexts = {}
-        for file_pattern in settings.files:
-            files = file_utils.get_files_by_pattern(file_pattern)
-            for f in files:
-                func_contexts = self._parser.parse(f, settings.functions)
-                file_contexts[f] = func_contexts
+        files = file_utils.get_files_by_pattern(
+            settings.project_dir, settings.files, settings.ignore_files
+        )
+        for f in files:
+            func_contexts = self._parser.parse(
+                f, settings.functions, settings.ignore_functions
+            )
+            file_contexts[f] = func_contexts
 
         # TODO: implement display message for all function context models that dont
-        # have existing docstrings. Make sure existing docstrings are parsed depending on language and style(?)
+        # have existing docstrings. Make sure existing docstrings are parsed depending on language
         # if settings.check:
         #     self._presenter.display_message()
 

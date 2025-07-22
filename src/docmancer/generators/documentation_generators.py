@@ -3,7 +3,7 @@ from docmancer.generators.llm.llm_agent_base import LlmAgentBase
 from docmancer.models.function_context import FunctionContextModel
 from docmancer.models.function_summary import FunctionSummaryModel
 from docmancer.models.parameter_model import ParameterModel
-from docmancer.generators.prompts import Prompt
+from docmancer.generators.llm.prompt import Prompt
 from abc import abstractmethod, ABC
 
 
@@ -35,8 +35,8 @@ class DefaultGenerator(GeneratorBase):
 
 
 class LlmGenerator(GeneratorBase):
-    def __init__(self, model: LlmAgentBase):
-        self._agent = model
+    def __init__(self, agent: LlmAgentBase):
+        self._agent = agent
         self._prompt = Prompt()
 
     def get_summary(self, context: FunctionContextModel) -> FunctionSummaryModel:
