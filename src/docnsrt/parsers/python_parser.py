@@ -69,7 +69,9 @@ class PythonParser(ParserBase):
             if child.type in ["parameter", "identifier"]:
                 param_name = self.get_node_text(child, source_code)
                 if param_name != "self":
-                    parameters.append(ParameterModel(name=param_name, type="any", desc=""))
+                    parameters.append(
+                        ParameterModel(name=param_name, type="any", desc="")
+                    )
                 else:
                     parent = parameters_node.parent
                     while parent is not None:
@@ -79,7 +81,9 @@ class PythonParser(ParserBase):
                         elif parent.type == "module":
                             # Parameter is named 'self', but function is not within a class,
                             # so keep the parameter.
-                            parameters.append(ParameterModel(name=param_name, type="any", desc=""))
+                            parameters.append(
+                                ParameterModel(name=param_name, type="any", desc="")
+                            )
                         parent = parent.parent
             elif child.type in ["typed_parameter", "typed_default_parameter"]:
 

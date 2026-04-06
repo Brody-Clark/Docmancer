@@ -174,11 +174,14 @@ class MyClass:
         pass
 """
     root_node = get_root_node(code).child(0).child_by_field_name('body').child(0)
-    context: FunctionContextModel = parser.extract_function_context(root_node, code, "test_module")
+    context: FunctionContextModel = parser.extract_function_context(
+        root_node, code, "test_module"
+    )
     assert "test_module.MyClass.method" in context.qualified_name
     assert context.docstring is None  # No docstring, only comments
     assert len(context.parameters) == 1
     assert context.parameters == [ParameterModel(name="param", type="any", desc="")]
+
 
 def test_get_function_nodes(parser):
     code = b"""
