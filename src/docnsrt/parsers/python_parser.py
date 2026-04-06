@@ -78,7 +78,7 @@ class PythonParser(ParserBase):
                         if parent.type == "class_definition":
                             # Skip the 'self' parameter since it's a class method
                             break
-                        elif parent.type == "module":
+                        if parent.type == "module":
                             # Parameter is named 'self', but function is not within a class,
                             # so keep the parameter.
                             parameters.append(

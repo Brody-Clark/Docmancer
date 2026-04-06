@@ -1,6 +1,5 @@
 """This module provides function summary generators"""
 
-import logging
 from docnsrt.core.models import (
     DocstringTemplateModel,
     ExceptionModel,
