@@ -34,7 +34,7 @@ class PythonParser(ParserBase):
         param_name = "*" + self.get_node_text(name_node, source_code)
         param_type = self.get_node_text(type_node, source_code) if type_node else "any"
 
-        return ParameterModel(name=param_name, type=param_type, desc="")
+        return ParameterModel(name=param_name, type=param_type)
 
     def _get_dictionary_splat_parameter(
         self, parameter_node: Node, source_code: str
@@ -44,7 +44,7 @@ class PythonParser(ParserBase):
         param_name = "**" + self.get_node_text(name_node, source_code)
         param_type = self.get_node_text(type_node, source_code) if type_node else "any"
 
-        return ParameterModel(name=param_name, type=param_type, desc="")
+        return ParameterModel(name=param_name, type=param_type)
 
     def _get_node_name_string(self, node: Node, source_code: str) -> str:
         name_node = node.child_by_field_name("name")
@@ -69,9 +69,7 @@ class PythonParser(ParserBase):
             if child.type in ["parameter", "identifier"]:
                 param_name = self.get_node_text(child, source_code)
                 if param_name != "self":
-                    parameters.append(
-                        ParameterModel(name=param_name, type="any", desc="")
-                    )
+                    parameters.append(ParameterModel(name=param_name, type="any"))
                 else:
                     parent = parameters_node.parent
                     while parent is not None:
@@ -82,7 +80,7 @@ class PythonParser(ParserBase):
                             # Parameter is named 'self', but function is not within a class,
                             # so keep the parameter.
                             parameters.append(
-                                ParameterModel(name=param_name, type="any", desc="")
+                                ParameterModel(name=param_name, type="any")
                             )
                         parent = parent.parent
             elif child.type in ["typed_parameter", "typed_default_parameter"]:
@@ -95,7 +93,7 @@ class PythonParser(ParserBase):
                         param_name = "*" + self.get_node_text(name_node, source_code)
                         param_type = self._get_node_type_string(child, source_code)
                         parameters.append(
-                            ParameterModel(name=param_name, type=param_type, desc="")
+                            ParameterModel(name=param_name, type=param_type)
                         )
                     elif child.children[0].type == "dictionary_splat_pattern":
                         name_node = self.get_first_child_of_type(
@@ -104,7 +102,7 @@ class PythonParser(ParserBase):
                         param_name = "**" + self.get_node_text(name_node, source_code)
                         param_type = self._get_node_type_string(child, source_code)
                         parameters.append(
-                            ParameterModel(name=param_name, type=param_type, desc="")
+                            ParameterModel(name=param_name, type=param_type)
                         )
                     elif child.children[0].type == "identifier":
                         name_node = child.children[0]
@@ -115,7 +113,7 @@ class PythonParser(ParserBase):
                         )
                         param_type = self._get_node_type_string(child, source_code)
                         parameters.append(
-                            ParameterModel(name=param_name, type=param_type, desc="")
+                            ParameterModel(name=param_name, type=param_type)
                         )
             elif child.type == "list_splat_pattern":
                 parameters.append(self._get_list_splat_parameter(child, source_code))

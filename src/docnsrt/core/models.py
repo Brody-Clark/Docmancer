@@ -19,17 +19,17 @@ class DocstringLocation(enum.Enum):
 class ParameterModel:
     """Model for function parameters."""
 
-    name: str
-    type: str
-    desc: str
+    name: str = ""
+    type: str = ""
+    desc: Optional[str] = ""
 
 
 @dataclass
 class ExceptionModel:
     """Model for function exceptions."""
 
-    type: str
-    desc: str
+    type: str = ""
+    desc: Optional[str] = ""
 
 
 @dataclass

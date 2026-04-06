@@ -70,9 +70,7 @@ class CSharpParser(ParserBase):
                 param_type = self.get_node_text(
                     child.child_by_field_name("type"), source_code
                 )
-                parameters.append(
-                    ParameterModel(name=param_name, type=param_type, desc="")
-                )
+                parameters.append(ParameterModel(name=param_name, type=param_type))
         return parameters
 
     def extract_function_context(
