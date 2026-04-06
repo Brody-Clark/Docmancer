@@ -20,6 +20,9 @@ class DocstringGenerator:
         self, context: FunctionContextModel
     ) -> DocstringTemplateModel:
         """Generates template values for a given function context."""
+        params: list[ParameterModel] = list(context.parameters)
+        for p in params:
+            p.desc = "_desc_"
         return DocstringTemplateModel(
             summary="_summary_",
             return_description="_desc_",
@@ -28,8 +31,5 @@ class DocstringGenerator:
             ),
             remarks="_remarks_",
             exceptions=[ExceptionModel(type="_type_", desc="_desc_")],
-            parameters=[
-                ParameterModel(name=p.name, type=p.type, desc="_desc_")
-                for p in context.parameters
-            ],
+            parameters=params,
         )

@@ -15,7 +15,7 @@ class DocstringLocation(enum.Enum):
     BELOW = "below"
 
 
-@dataclass
+@dataclass(slots=True)
 class ParameterModel:
     """Model for function parameters."""
 
@@ -24,7 +24,7 @@ class ParameterModel:
     desc: Optional[str] = ""
 
 
-@dataclass
+@dataclass(slots=True)
 class ExceptionModel:
     """Model for function exceptions."""
 
@@ -32,7 +32,7 @@ class ExceptionModel:
     desc: Optional[str] = ""
 
 
-@dataclass
+@dataclass(slots=True)
 class DocstringModel:
     """Model for function docstrings."""
 
@@ -40,7 +40,7 @@ class DocstringModel:
     start_line: int
 
 
-@dataclass
+@dataclass(slots=True)
 class FunctionContextModel:
     """Model for function context information."""
 
@@ -52,7 +52,7 @@ class FunctionContextModel:
     return_type: str | None
 
 
-@dataclass
+@dataclass(slots=True)
 class WritableFileModel:
     """Model for writable file information."""
 
@@ -61,7 +61,7 @@ class WritableFileModel:
     last_size_bytes: Optional[int] = None
 
 
-@dataclass
+@dataclass(slots=True)
 class DocstringPresentationModel:
     """Model for function writable documentation."""
 
@@ -78,7 +78,7 @@ class DocstringPresentationModel:
     )  # Location of the docstring
 
 
-@dataclass
+@dataclass(slots=True)
 class FileProcessingContextModel:
     """Model for capturing docstring data that is needed to write to a file"""
 
@@ -87,7 +87,7 @@ class FileProcessingContextModel:
     docstrings: list[DocstringPresentationModel]
 
 
-@dataclass
+@dataclass(slots=True)
 class DocstringTemplateModel:
     """Model for docstring template values."""
 
@@ -99,7 +99,7 @@ class DocstringTemplateModel:
     remarks: Optional[str] = None
 
 
-@dataclass
+@dataclass(slots=True)
 class FormattedDocstringModel:
     """Model representing a formatted docstring."""
 
