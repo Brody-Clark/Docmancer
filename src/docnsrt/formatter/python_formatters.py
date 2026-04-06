@@ -11,6 +11,7 @@ from docnsrt.core.models import (
 import docnsrt.utils.file_utils as fu
 
 INDENT_SPACES = 4
+TAB = "    "
 
 
 def _get_docstring_model(
@@ -54,12 +55,14 @@ class PythonPepFormatter(FormatterBase):
         if template_values.parameters:
             lines.append("Args:")
             for param in template_values.parameters:
-                lines.append(f"    {param.name} ({param.type}): {param.desc}")
+                lines.append(f"{TAB}{param.name} ({param.type}): {param.desc}")
 
         if template_values.return_description:
             lines.append("")
             lines.append("Returns:")
-            lines.append(f"    {template_values.return_description}")
+            lines.append(
+                f"{TAB}{template_values.return_type}: {template_values.return_description}"
+            )
 
         lines.append('"""')
 
@@ -88,13 +91,15 @@ class PythonNumpyFormatter(FormatterBase):
         if template_values.parameters:
             for param in template_values.parameters:
                 lines.append(f"{param.name} : ({param.type})")
-                lines.append(f"  {param.desc}")
+                lines.append(f"{TAB}{param.desc}")
         lines.append("")
 
         if template_values.return_description:
             lines.append("Returns")
             lines.append("-------")
-            lines.append(f"{template_values.return_description}")
+            if template_values.return_type:
+                lines.append(template_values.return_type)
+            lines.append(f"{TAB}{template_values.return_description}")
             lines.append("")
 
         lines.append("Examples")

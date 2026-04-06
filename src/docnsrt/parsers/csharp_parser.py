@@ -119,6 +119,7 @@ class CSharpParser(ParserBase):
             parameters=parameters,
             docstring=docstring,
             start_line=root_node.range.start_point.row,
+            return_type=None,
         )
 
     def get_docstring(self, node, source_code: str) -> DocstringModel:

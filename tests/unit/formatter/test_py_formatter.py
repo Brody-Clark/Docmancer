@@ -24,11 +24,13 @@ class TestPepFormatter(unittest.TestCase):
             parameters=[ParameterModel("param", "any", "_desc_")],
             start_line=1,
             docstring=DocstringModel(lines=[], start_line=2),
+            return_type="str",
         )
         test_func_summary = DocstringTemplateModel(
             summary="_summary_",
             return_description="_desc_",
             parameters=[ParameterModel("param", "any", "_desc_")],
+            return_type="str",
         )
         test_doc_model = formatter.get_formatted_docstring(
             file_path="test_file.py",
@@ -44,7 +46,7 @@ class TestPepFormatter(unittest.TestCase):
             "    param (any): _desc_\n",
             "\n",
             "Returns:\n",
-            "    _desc_\n",
+            "    str: _desc_\n",
             '"""\n',
         ]
 
@@ -71,11 +73,13 @@ class TestNumpyFormatter(unittest.TestCase):
             parameters=[ParameterModel("param", "any", "_desc_")],
             start_line=1,
             docstring=DocstringModel(lines=[], start_line=2),
+            return_type="str",
         )
         test_func_summary = DocstringTemplateModel(
             summary="_summary_",
             return_description="_desc_",
             parameters=[ParameterModel("param", "any", "_desc_")],
+            return_type="str",
         )
         test_doc_model = formatter.get_formatted_docstring(
             file_path="test_file.py",
@@ -90,11 +94,12 @@ class TestNumpyFormatter(unittest.TestCase):
             "Parameters\n",
             "----------\n",
             "param : (any)\n",
-            "  _desc_\n",
+            "    _desc_\n",
             "\n",
             "Returns\n",
             "-------\n",
-            "_desc_\n",
+            "str\n",
+            "    _desc_\n",
             "\n",
             "Examples\n",
             "--------\n",

@@ -161,6 +161,39 @@ class PythonParser(ParserBase):
                 )
         return None
 
+    def get_return_type(self, root_node, source_code: str) -> str | None:
+        """Extract the return type annotation from a function_definition node.
+
+        Handles common tree-sitter shapes: a child with field name "return_type",
+        an explicit annotation node, or the node following a '->' punctuation.
+        Returns the annotated type as a string or None when not present.
+        """
+        # Prefer a field named "return_type" if present
+        try:
+            rt = root_node.child_by_field_name("return_type")
+            if rt:
+                return self.get_node_text(rt, source_code)
+        except Exception as e:
+            logger.warning("Exception occurred during return type parsing: %s", e)
+
+        # Look for annotation/typed node among children
+        for child in root_node.children:
+            if child.type in ("annotation", "type", "return_type"):
+                return self.get_node_text(child, source_code)
+
+        # Fallback: find a '->' token and take the next sibling as the return type
+        for i, child in enumerate(root_node.children):
+            # token text may be '->' represented as punctuation; compare the text
+            try:
+                txt = self.get_node_text(child, source_code)
+            except Exception:
+                txt = ""
+            if txt == "->":
+                if i + 1 < len(root_node.children):
+                    return self.get_node_text(root_node.children[i + 1], source_code)
+
+        return None
+
     def extract_function_context(
         self, root_node, source_code: str, module_name: str
     ) -> FunctionContextModel:
@@ -182,6 +215,7 @@ class PythonParser(ParserBase):
             docstring = self.get_docstring(block_node, source_code)
 
         qualified_name = self.get_qualified_name(root_node, source_code)
+        return_type = self.get_return_type(root_node, source_code)
 
         context = FunctionContextModel(
             qualified_name=f"{module_name}.{qualified_name}",
@@ -189,5 +223,6 @@ class PythonParser(ParserBase):
             signature=signature,
             docstring=docstring,
             start_line=root_node.start_point[0],
+            return_type=return_type,
         )
         return context

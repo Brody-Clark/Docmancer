@@ -8,13 +8,10 @@ from docnsrt.core.models import (
     FunctionContextModel,
 )
 
-logger = logging.getLogger(__name__)
-
 
 class DocstringGenerator:
     """
-    Default implementation of the function summary generator.
-    Provides no summary, only placeholders.
+    Generates placeholder values for docstrings based on function contexts.
     """
 
     def __init__(self):
@@ -27,7 +24,9 @@ class DocstringGenerator:
         return DocstringTemplateModel(
             summary="_summary_",
             return_description="_desc_",
-            return_type="_type_",
+            return_type=(
+                "_type_" if context.return_type is None else context.return_type
+            ),
             remarks="_remarks_",
             exceptions=[ExceptionModel(type="_type_", desc="_desc_")],
             parameters=[

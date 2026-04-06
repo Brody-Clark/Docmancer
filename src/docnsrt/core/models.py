@@ -49,6 +49,7 @@ class FunctionContextModel:
     parameters: List[ParameterModel]
     docstring: DocstringModel
     start_line: int
+    return_type: str | None
 
 
 @dataclass
