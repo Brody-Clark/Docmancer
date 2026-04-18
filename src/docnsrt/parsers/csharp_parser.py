@@ -91,15 +91,19 @@ class CSharpParser(ParserBase):
             elif child_node.type == "predefined_type":
                 return_type = self.get_node_text(child_node, source_code=source_code)
             elif child_node.type == "identifier":
-                identifiers.append(
-                    self.get_node_text(child_node, source_code=source_code)
-                )
+                identifier = self.get_node_text(child_node, source_code=source_code)
+
+                # Custom return types are labeled as identifiers.
+                if return_type is None:
+                    return_type = identifier
+                else:
+                    identifiers.append(identifier)
 
         docstring = self.get_docstring(root_node, source_code)
 
         modifiers_str = " ".join(modifiers) if modifiers else ""
         identifiers_str = " ".join(identifiers) if identifiers else ""
-        return_type = f" {return_type} " if return_type is not None else ""
+        return_type = return_type if return_type is not None else ""
         parameters_str = (
             self.get_node_text(parameters_node, source_code=source_code)
             if parameters_node
@@ -113,11 +117,11 @@ class CSharpParser(ParserBase):
             qualified_name=module_name
             + "."
             + self.get_qualified_name(root_node, source_code=source_code),
-            signature=f"{modifiers_str}{return_type}{identifiers_str}{parameters_str}",
+            signature=f"{modifiers_str} {return_type} {identifiers_str}{parameters_str}",
             parameters=parameters,
             docstring=docstring,
             start_line=root_node.range.start_point.row,
-            return_type=None,
+            return_type=return_type,
         )
 
     def get_docstring(self, node, source_code: str) -> DocstringModel:
