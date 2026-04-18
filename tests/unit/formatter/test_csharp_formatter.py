@@ -25,6 +25,7 @@ class TestCsharpXmlFormatter(unittest.TestCase):
             ],
             docstring=DocstringModel(lines=[], start_line=0),
             start_line=1,
+            return_type="void",
         )
 
         test_param_1 = ParameterModel(
@@ -70,6 +71,7 @@ class TestCsharpXmlFormatter(unittest.TestCase):
             ],
             start_line=10,
             docstring=DocstringModel(lines=[], start_line=0),
+            return_type="void",
         )
         param1 = ParameterModel(name="x", type="int", desc="first number")
         param2 = ParameterModel(name="y", type="int", desc="second number")
@@ -105,6 +107,7 @@ class TestCsharpXmlFormatter(unittest.TestCase):
             parameters=[],
             start_line=5,
             docstring=DocstringModel(lines=[], start_line=0),
+            return_type="void",
         )
         func_summary = DocstringTemplateModel(
             summary="Prints Hello.",
@@ -135,6 +138,7 @@ class TestCsharpXmlFormatter(unittest.TestCase):
             parameters=[],
             start_line=1,
             docstring=DocstringModel(lines=[], start_line=0),
+            return_type="void",
         )
         func_summary = DocstringTemplateModel(
             summary="Bad offset test.",

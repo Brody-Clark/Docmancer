@@ -13,7 +13,7 @@ class InvalidUserException(Exception):
 #     print("helo")
 
 
-def string_manip(s):
+def string_manip(s: str) -> str:
     """
     _summary_
 
@@ -25,6 +25,10 @@ def string_manip(s):
     """
     s = s[::-1]
     return s
+
+
+def optional_return() -> str | None:
+    return "Hello"
 
 
 def login(user, p):

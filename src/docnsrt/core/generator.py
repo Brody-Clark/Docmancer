@@ -1,6 +1,5 @@
 """This module provides function summary generators"""
 
-import logging
 from docnsrt.core.models import (
     DocstringTemplateModel,
     ExceptionModel,
@@ -8,13 +7,10 @@ from docnsrt.core.models import (
     FunctionContextModel,
 )
 
-logger = logging.getLogger(__name__)
-
 
 class DocstringGenerator:
     """
-    Default implementation of the function summary generator.
-    Provides no summary, only placeholders.
+    Generates placeholder values for docstrings based on function contexts.
     """
 
     def __init__(self):
@@ -24,14 +20,16 @@ class DocstringGenerator:
         self, context: FunctionContextModel
     ) -> DocstringTemplateModel:
         """Generates template values for a given function context."""
+        params: list[ParameterModel] = list(context.parameters)
+        for p in params:
+            p.desc = "_desc_"
         return DocstringTemplateModel(
             summary="_summary_",
             return_description="_desc_",
-            return_type="_type_",
+            return_type=(
+                "_type_" if context.return_type is None else context.return_type
+            ),
             remarks="_remarks_",
             exceptions=[ExceptionModel(type="_type_", desc="_desc_")],
-            parameters=[
-                ParameterModel(name=p.name, type=p.type, desc="_desc_")
-                for p in context.parameters
-            ],
+            parameters=params,
         )

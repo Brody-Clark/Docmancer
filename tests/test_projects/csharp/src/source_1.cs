@@ -33,6 +33,12 @@ namespace SampleProject
         {
             Console.WriteLine($"Hello, {name}!");
         }
+
+        public static Greeter GetGreeter()
+        {
+            return new Greeter();
+        }
+
     };
 
     // Top-level static class
@@ -45,8 +51,12 @@ namespace SampleProject
 
     };
 
-    public static Greeter GetGreeter()
+    public class Foo
     {
-        return new Greeter();
+
+    };
+    public static Foo GetFoo(Foo f)
+    {
+        return new Foo();
     }
 }
