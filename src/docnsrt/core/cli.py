@@ -217,7 +217,7 @@ def parse_args() -> DocnsrtConfig:
     parser.add_argument(
         "--log-level",
         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
-        help="Logging level (overrides docnsrt_LOG_LEVEL env var)",
+        help="Logging level (overrides DOCNSRT_LOG_LEVEL env var)",
         default="INFO",
     )
 

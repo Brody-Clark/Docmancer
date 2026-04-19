@@ -2,19 +2,9 @@
 
 from enum import Enum
 import logging
-import io
-import sys
-import threading
-from typing import List, Callable, Any, Coroutine
 from dataclasses import dataclass
-import html
-
-# from rich.spinner import Spinner
-from prompt_toolkit.styles import Style
-from prompt_toolkit.shortcuts import prompt
-from docnsrt.core.models import DocstringPresentationModel
 from rich.markup import escape
-from docnsrt.utils import platform_utils
+from rich.console import Console
 from prompt_toolkit.application import Application
 from prompt_toolkit.layout import Layout, HSplit, Window
 from prompt_toolkit.widgets import TextArea
@@ -22,16 +12,12 @@ from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.styles import Style
 from prompt_toolkit.layout.controls import FormattedTextControl
 from prompt_toolkit.formatted_text import FormattedText
-from prompt_toolkit.layout.dimension import D
 from prompt_toolkit.formatted_text import HTML
-from prompt_toolkit import PromptSession
-from prompt_toolkit.enums import EditingMode
 from prompt_toolkit.layout import ConditionalContainer
 from prompt_toolkit.filters import Condition
-from rich.console import Console
+from docnsrt.core.models import DocstringPresentationModel
 
 logger = logging.getLogger(__name__)
-
 
 class UserResponse(Enum):
     """
@@ -105,7 +91,7 @@ class _PresenterApp:
 
         # --- Existing docstring ---
         existing_text = (
-            "".join(doc.existing_docstring.lines)
+            "\n".join(doc.existing_docstring.lines)
             if doc.existing_docstring
             else "(none)"
         )

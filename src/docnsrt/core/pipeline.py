@@ -84,7 +84,6 @@ class DocumentationPipeline:
         # If no docstrings to write, exit
         if not file_contexts:
             logger.debug("No docstrings to write, exiting")
-            # self._presenter.clear_console()
             self._presenter.print_success("0/0 docstrings written successfully")
             return
 
@@ -94,8 +93,6 @@ class DocumentationPipeline:
         if len(self._errors) > 0:
             for e in self._errors:
                 self._presenter.print_error(f"Error: {e}")
-        # else:
-        #     # self._presenter.clear_console()
         self._presenter.print_success(
             f"{count_written}/{docstring_count} docstrings written successfully"
         )
@@ -293,5 +290,4 @@ class DocumentationPipeline:
             f.seek(0)
             f.truncate()
             f.writelines(lines)
-        portalocker.unlock(f)
         logger.info("Wrote %i docstrings to file %s", len(docs), file_path)
