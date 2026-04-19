@@ -426,7 +426,7 @@ class Presenter:
         self._console.print("\n")
         self._console.clear()
         self._console.print(Rule(style="grey69", title="Source"))
-        grid = Table.grid(expand=True)
+        grid = Table.grid(expand=False)
         grid.add_column(justify="left")
         grid.add_column(justify="left")
         grid.add_column(justify="center")
@@ -452,7 +452,7 @@ class Presenter:
         #     f"Accept ({ACCEPT}), Edit ({EDIT}), Skip ({SKIP}), Quit ({QUIT}): "
         # )
         result = self._session.prompt("> ")
-        self._console.clear()
+
         return result.strip().lower()
 
     def clear_console(self):
