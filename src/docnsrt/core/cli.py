@@ -126,7 +126,7 @@ def parse_args() -> DocnsrtConfig:
     """Parses command line arguments and returns a docnsrtConfig object."""
 
     parser = argparse.ArgumentParser(
-        description="Generate documentation from source code.",
+        description="Generate documentation templates from source code.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 

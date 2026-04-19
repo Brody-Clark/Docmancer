@@ -25,19 +25,14 @@ class DocstringStyle(Enum):
 
 
 STYLE_DEFINITIONS: Dict[str, Dict[str, Any]] = {
-    DocstringStyle.BASIC.value: {
-        "description": "Basic docstring format with minimal structure."
-    },
+
     DocstringStyle.PEP.value: {
         "description": "PEP 257 docstring conventions (often reStructuredText-like)."
     },
-    DocstringStyle.DOXYGEN.value: {
-        "description": "Doxygen-compatible docstring format."
-    },
     DocstringStyle.NUMPY.value: {"description": "NumPy/SciPy style docstring format."},
-    DocstringStyle.CUSTOM.value: {
-        "description": "User-defined style docstring format."
-    },
+    # DocstringStyle.CUSTOM.value: {
+    #     "description": "User-defined style docstring format."
+    # },
     DocstringStyle.XML.value: {"description": "Formatting with tags in xml format."},
 }
 
