@@ -2,23 +2,20 @@
 
 from enum import Enum
 import logging
-import io
-import sys
-import threading
-import tempfile
-import subprocess
-from typing import List, Callable, Any, Coroutine
 from dataclasses import dataclass
-from rich.console import Console
-from rich.rule import Rule
 from rich.markup import escape
-from rich.table import Table
-
-# from rich.spinner import Spinner
+from rich.console import Console
+from prompt_toolkit.application import Application
+from prompt_toolkit.layout import Layout, HSplit, Window
+from prompt_toolkit.widgets import TextArea
+from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.styles import Style
-from prompt_toolkit.shortcuts import prompt
+from prompt_toolkit.layout.controls import FormattedTextControl
+from prompt_toolkit.formatted_text import FormattedText
+from prompt_toolkit.formatted_text import HTML
+from prompt_toolkit.layout import ConditionalContainer
+from prompt_toolkit.filters import Condition
 from docnsrt.core.models import DocstringPresentationModel
-from docnsrt.utils import platform_utils
 
 logger = logging.getLogger(__name__)
 
@@ -35,10 +32,10 @@ class UserResponse(Enum):
 
 
 USER_RESPONSES = {
-    UserResponse.QUIT: "q",
-    UserResponse.ACCEPT: "a",
-    UserResponse.EDIT: "e",
-    UserResponse.SKIP: "s",
+    UserResponse.QUIT: "quit",
+    UserResponse.ACCEPT: "accept",
+    UserResponse.EDIT: "exit",
+    UserResponse.SKIP: "skip",
 }
 
 ACCEPT = USER_RESPONSES[UserResponse.ACCEPT]
@@ -57,25 +54,208 @@ class UserResponseModel:
     response: UserResponse
 
 
-# 'bg:#0000FF' is hex for blue.
-blue_background_style = Style.from_dict(
-    {
-        "prompt": "#FFFFFF bg:#000094",
-        "bottom-toolbar": "#FFFFFF bg:#0000FF",
-        "completion-menu": "bg:#333333 #FFFFFF",
-        "arg-style": "bold #FFD700",
-        "input": "#FFFFFF bg:#0000FF",
-    }
-)
+class _PresenterApp:
+    def __init__(self, doc: DocstringPresentationModel):
+        self.doc = doc
+        self.result = None
+        self.edit_mode = False
+
+        self.editor = TextArea(
+            text="".join(doc.new_docstring.lines or [""]),
+            multiline=True,
+            scrollbar=True,
+            focusable=True,
+            style="class:generated",
+        )
+        self.editor_footer = Window(
+            content=FormattedTextControl(
+                text=HTML("<b>Ctrl+S: Save &amp; Exit | Esc: Cancel</b>")
+            ),
+            height=1,
+            style="class:footer",
+        )
+
+        self.editor_container = HSplit(
+            [
+                self.editor,
+                Window(height=1, char="-"),
+                self.editor_footer,
+            ]
+        )
+
+        # --- Header ---
+        self.header = Window(
+            content=FormattedTextControl(text=self._get_header_text()),
+            wrap_lines=True,
+            height=None,
+        )
+
+        # --- Existing docstring ---
+        existing_text = (
+            "\n".join(doc.existing_docstring.lines)
+            if doc.existing_docstring
+            else "(none)"
+        )
+
+        self.existing = TextArea(
+            text=existing_text,
+            read_only=True,
+            scrollbar=True,
+            focusable=False,
+            style="class:existing",
+        )
+
+        # --- Editable generated docstring ---
+        generated_text = "".join(doc.new_docstring.lines or [""])
+
+        self.generated = TextArea(
+            text=generated_text,
+            multiline=True,
+            read_only=True,
+            scrollbar=True,
+            focusable=False,
+            style="class:generated",
+        )
+
+        # --- Footer ---
+        self.footer = Window(
+            content=FormattedTextControl(
+                text=HTML(
+                    "<b>a</b>: Accept | "
+                    "<b>e</b>: Edit | "
+                    "<b>s</b>: Skip | "
+                    "<b>q</b>: Quit"
+                )
+            ),
+            height=1,
+            style="class:footer",
+        )
+
+        self.view_container = HSplit(
+            [
+                self.header,
+                Window(height=1, char="-"),
+                self.existing,
+                Window(height=1, char="-"),
+                self.generated,
+                Window(height=1, char="-"),
+                self.footer,
+            ]
+        )
+        # --- Keybindings ---
+        kb = KeyBindings()
+
+        @kb.add("q")
+        def _(event):
+            if not self.edit_mode:
+                self.result = (QUIT, None)
+                event.app.exit()
+
+        @kb.add("a")
+        def _(event):
+            if not self.edit_mode:
+                self.result = (ACCEPT, self.doc.new_docstring.lines)
+                event.app.exit()
+
+        @kb.add("s")
+        def _(event):
+            if not self.edit_mode:
+                self.result = (SKIP, None)
+                event.app.exit()
+
+        @kb.add("e")
+        def _(event):
+            if not self.edit_mode:
+                self.edit_mode = True
+                event.app.layout.focus(self.editor)
+
+        # ESC to leave edit mode
+        @kb.add("escape")
+        def _(event):
+            if self.edit_mode:
+                self.edit_mode = False
+                event.app.layout.focus(self.generated)
+
+        @kb.add("c-s")
+        def _(event):
+            if self.edit_mode:
+                text = self.editor.text
+                if not text.endswith("\n"):
+                    text += "\n"
+
+                lines = text.splitlines(keepends=True)
+
+                self.result = (EDIT, lines)
+                event.app.exit()
+
+        root_container = HSplit(
+            [
+                ConditionalContainer(
+                    self.view_container, filter=Condition(self._is_view_mode)
+                ),
+                ConditionalContainer(
+                    self.editor_container, filter=Condition(self._is_edit_mode)
+                ),
+            ]
+        )
+
+        self.app = Application(
+            layout=Layout(root_container, focused_element=self.footer),
+            key_bindings=kb,
+            full_screen=True,
+            style=Style.from_dict(
+                {
+                    "label": "bg:default #ffff66",
+                    "file.path": "bg:default #00ffff",
+                    "function": "bg:default #ffff66",
+                    "existing": "bg:default #206020",
+                    "generated": "bg:default #0000ff",
+                    "footer": "bg:#aaaaaa #000000",
+                }
+            ),
+        )
+
+    def _get_header_text(self):
+        doc = self.doc
+        return FormattedText(
+            [
+                ("class:label.file", "File: "),
+                ("", str(doc.file_path or "unknown")),
+                ("", "    "),
+                ("class:label.name", "Name: "),
+                ("", str(doc.qualified_name)),
+                ("", "    "),
+                ("class:label.line", "Line: "),
+                ("", str(doc.new_docstring.start_line or "unknown")),
+                ("\n", "\n"),
+                ("class:label.func", "Function: "),
+                ("", str(doc.signature)),
+            ]
+        )
+
+    def _is_edit_mode(self):
+        return self.edit_mode
+
+    def _is_view_mode(self):
+        return not self.edit_mode
+
+    def run(self):
+        """
+        Runs the prompt toolkit app
+        """
+        self.app.run()
+        return self.result
 
 
 class Presenter:
     """Presenter class for user interaction and displaying information."""
 
     def __init__(self):
-        self._console = Console()
+        pass
 
-    def get_user_approval(self, doc: DocstringPresentationModel) -> UserResponseModel:
+    def get_user_approval(
+        self, doc: DocstringPresentationModel
+    ) -> UserResponseModel | None:
         """
         Gets user approval for the generated documentation.
         Args:
@@ -83,187 +263,32 @@ class Presenter:
         Returns:
             A UserResponseModel.
         """
-        while True:
-            response = self.interact(doc)
-            if response == USER_RESPONSES[UserResponse.QUIT]:
-                return UserResponseModel(doc_model=None, response=UserResponse.QUIT)
-            if response == USER_RESPONSES[UserResponse.ACCEPT]:
-                return UserResponseModel(doc_model=doc, response=UserResponse.ACCEPT)
-            if response == USER_RESPONSES[UserResponse.SKIP]:
-                return UserResponseModel(doc_model=doc, response=UserResponse.SKIP)
-            if response == USER_RESPONSES[UserResponse.EDIT]:
-                try:
-                    doc.new_docstring.lines = self.edit_text_with_editor(
-                        doc.new_docstring.lines
-                    )
-                except Exception as e:
-                    logger.info(e)
-                continue
-
-    def edit_text_with_editor(self, initial_text: List[str]) -> List[str]:
-        """
-        Opens the default text editor with the initial text for editing.
-        """
-        editor = platform_utils.get_default_editor()
-        with tempfile.NamedTemporaryFile(suffix=".tmp", mode="w+", delete=False) as tf:
-            tf.writelines(initial_text)
-            tf.flush()
-            file_path = tf.name
-
-        subprocess.call([editor, file_path])
-
-        with open(file_path, "r", encoding="utf-8") as tf:
-            return tf.readlines()
+        return self.interact(doc=doc)
 
     def print_error(self, message: str):
         """Prints an error message."""
-        self._console.print(
-            f"[bold red]Error:[/bold red] {escape(message)}", style="red"
-        )
+        console = Console()
+        console.print(f"[bold red]Error:[/bold red] {escape(message)}", style="red")
 
     def print_success(self, message: str):
         """Prints a success message."""
-        self._console.print(
-            f"[bold green]Success:[/bold green] {message}", style="green"
-        )
+        console = Console()
+        console.print(f"[bold green]Success:[/bold green] {message}", style="green")
 
-    def decorate_slow_task_synchronous(
-        self, task_description: str, slow_task: Callable[..., Any], *args, **kwargs
-    ) -> Any:
-        """Decorates a slow task with a spinner.
-
-        Args:
-            task_description (str): Description of the task being performed.
-            slow_task (Callable[..., Any]): The slow task to be executed.
-
-        Raises:
-            RuntimeError: If the slow task fails.
-
-        Returns:
-            Any: The result of the slow task.
-        """
-        spinner_name = "star"
-        result_container = {"result": None, "exception": None}
-
-        def target_function():
-            """
-            The function to run in the separate thread, with stdout redirected.
-            """
-            # Create a StringIO object to capture stdout
-            old_stdout = sys.stdout
-            redirected_stdout = io.StringIO()
-            sys.stdout = redirected_stdout
-
-            try:
-                result_container["result"] = slow_task(*args, **kwargs)
-            except Exception as e:
-                result_container["exception"] = e
-            finally:
-                # Restore original stdout
-                sys.stdout = old_stdout
-                # Store captured output
-                result_container["captured_output"] = redirected_stdout.getvalue()
-                redirected_stdout.close()  # Close the StringIO object
-
-        # Start the slow_task in a separate thread
-        thread = threading.Thread(target=target_function)
-        thread.start()
-
-        with self._console.status(
-            f"[bold magenta]{task_description}...[/bold magenta]", spinner=spinner_name
-        ):
-            while thread.is_alive():
-                # Keep the main thread alive and let rich update the spinner
-                pass
-
-        # After the thread finishes, retrieve the result or re-raise the exception
-        if result_container["captured_output"]:
-            # Optionally print the captured output *after* the spinner has stopped
-            self._console.print(
-                f"\n[dim italic]Captured output from task:\n{result_container['captured_output'].strip()}[/dim italic]"
-            )
-
-        # After the thread finishes, retrieve the result or re-raise the exception
-        if result_container["exception"]:
-            self.print_error(f"Task failed: {result_container['exception']}")
-            raise RuntimeError(result_container["exception"])
-
-        return result_container["result"]
-
-    async def magic_spinner_async(
-        self,
-        task_description: str,
-        async_slow_task: Callable[..., Coroutine],
-        *args,
-        **kwargs,
-    ) -> Any:
-        """
-        Displays a magic-themed spinner while an asynchronous slow task executes.
-
-        Args:
-            task_description (str): A descriptive message for the user.
-            async_slow_task (Callable[..., Coroutine]): The asynchronous function (coroutine) to execute.
-            *args: Positional arguments to pass to the async_slow_task.
-            **kwargs: Keyword arguments to pass to the async_slow_task.
-
-        Returns:
-            Any: The result of the async_slow_task.
-        """
-        spinner_name = "line"  # Or another magical spinner
-        with self._console.status(
-            f"[bold magenta]{task_description}...[/bold magenta]", spinner=spinner_name
-        ):
-            try:
-                result = await async_slow_task(*args, **kwargs)
-                return result
-            except Exception as e:
-                self.print_error(f"Asynchronous task failed: {e}")
-                raise  # Re-raise the exception after printing error
-
-    def get_blue_prompt(self, message: str) -> str:
-        """
-        Shows a prompt_toolkit prompt with a blue background applied to the input area.
-        """
-        answer = prompt(message=message, style=blue_background_style)
-        return answer
-
-    def interact(self, doc: DocstringPresentationModel):
+    def interact(self, doc: DocstringPresentationModel) -> UserResponseModel | None:
         """
         Interacts with the user to accept, edit, skip, or quit the documentation generation.
         """
-        self._console.print("\n")
-        self._console.clear()
-        self._console.print(Rule(style="grey69", title="Source"))
-        grid = Table.grid(expand=True)
-        grid.add_column(justify="left")
-        grid.add_column(justify="left")
-        grid.add_column(justify="center")
+        app = _PresenterApp(doc)
+        action, text = app.run()
 
-        grid.add_row(
-            f"[grey69]File:[/grey69] [yellow]{doc.file_path or 'unknown'}",
-            f"[grey69]Qualified Name:[/grey69] [magenta]{doc.qualified_name}[/magenta]",
-            f"[grey69]Line:[/grey69] [cyan]{doc.new_docstring.start_line or 'unknown'}",
-        )
-        self._console.print(grid)
-        self._console.print(f"[grey69]Function:[/grey69] [grey]{escape(doc.signature)}")
-
-        if doc.existing_docstring:
-            current_lines = "\n".join(doc.existing_docstring.lines)
-            self._console.print("[grey69]Existing Docstring:")
-            self._console.print(f"[pale_green1]{escape(current_lines.strip())}")
-        self._console.print(Rule(style="grey69", title="Generated Docstring"))
-        formatted_doc = "".join(doc.new_docstring.lines).strip()
-        self._console.print(f"[green]{escape(formatted_doc)}")
-        self._console.print(Rule(style="grey69"))
-
-        result = self.get_blue_prompt(
-            f"Accept ({ACCEPT}), Edit ({EDIT}), Skip ({SKIP}), Quit ({QUIT}): "
-        )
-        self._console.clear()
-        return result.strip().lower()
-
-    def clear_console(self):
-        """
-        Clears the console output.
-        """
-        self._console.clear()
+        if action == QUIT:
+            return UserResponseModel(doc_model=None, response=UserResponse.QUIT)
+        if action == ACCEPT:
+            return UserResponseModel(doc_model=doc, response=UserResponse.ACCEPT)
+        if action == SKIP:
+            return UserResponseModel(doc_model=doc, response=UserResponse.SKIP)
+        if action == EDIT:
+            doc.new_docstring.lines = text
+            return UserResponseModel(doc_model=doc, response=UserResponse.ACCEPT)
+        return None

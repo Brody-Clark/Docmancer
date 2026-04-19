@@ -152,8 +152,8 @@ class CSharpParser(ParserBase):
         # Mulit-line comment blocks using /**/ are captured in a single node
         # with the newlines included
         if comment_text.startswith("/*"):
-            for line in comment_text.split("\n"):
-                docstring_lines.append(line)
+            for line in comment_text.splitlines():
+                docstring_lines.append(line.strip())
         else:
             # Multi-line comments using // need to be found by walking upwards
             docstring_lines.insert(0, comment_text)

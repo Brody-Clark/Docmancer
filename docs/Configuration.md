@@ -13,14 +13,14 @@ docnsrt supports several options for documentation generation.
 | `--write`                  | Writes generated strings to files                           | N/A     |
 | `--config <path>`          | Path to config file                                         | `.docnsrt.yaml`     |
 | `--file <path>`            | Glob pattern path to a specific file to document            | `*`  |
-| `--log-level`              | Level of logging (DEBUG, INFOG, WARNING, ERROR)            | `INFO`|
+| `--log-level`              | Level of logging (DEBUG, INFO, WARNING, ERROR)            | `INFO`|
 | `--ignore-files <name...>` | Specific file names or glob pattern to ignore (space-separated list) | N/A |
 | `--functions <name...>`    | Specific function names or glob pattern to target (space-separated list) | `[*]`    |
 | `--ignore-functions <name...>`| Specific function names or glob pattern to ignore (space-separated list) | N/A   |
 | `--project-dir <path>`     | Path to project source.                                     | Current Working Directory |
-| `--language, -l <language>`    | Language of source files.                                   | N/A |
+| `--language, -l <language>`    | Language of source files: *See supported languages*                                | N/A |
 | `--force-all`              | Skips prompting for each generated docstring. Force writes to files. | N/A |
-| `--style, -s <style>`          | Genereated docstring format: *See supported formats*        | `None`    |
+| `--style, -s <style>`          | Generated docstring format: *See supported styles*        | `None`    |
 | `-h, --help`               | Show help message and exit                                   | N/A     |
 
 ## Configuration File
@@ -61,3 +61,11 @@ ignore_functions:     # Functions to ignore by pattern
 - PEP
 - XML
 - Numpy
+
+## Supported Languages
+
+> [!NOTE]
+> Support for more languages is ongoing
+
+- python
+- csharp
