@@ -19,8 +19,16 @@ from prompt_toolkit.styles import Style
 from prompt_toolkit.shortcuts import prompt
 from docnsrt.core.models import DocstringPresentationModel
 from docnsrt.utils import platform_utils
+from prompt_toolkit import PromptSession
+from prompt_toolkit.styles import Style
+from prompt_toolkit.key_binding import KeyBindings
+from prompt_toolkit.enums import EditingMode
 
 logger = logging.getLogger(__name__)
+
+
+from dataclasses import dataclass
+from enum import Enum, auto
 
 
 class UserResponse(Enum):
@@ -57,6 +65,38 @@ class UserResponseModel:
     response: UserResponse
 
 
+class Mode(Enum):
+    VIEW = auto()
+    EDIT = auto()
+    CONFIRM = auto()
+
+
+@dataclass
+class UIState:
+    doc: DocstringPresentationModel
+    mode: Mode = Mode.VIEW
+    cursor_y: int = 0
+    scroll_offset: int = 0
+    edited_lines: list[str] = None
+    running: bool = True
+    result: UserResponseModel | None = None
+
+docstring_style = Style.from_dict({
+    # main input area
+    # "": "bg:#000000 #0000ff", # black background, blue text
+
+    # cursor
+    "cursor": "bg:#ffffff #000000",
+
+    # bottom toolbar
+    "bottom-toolbar": "bg:#222222 #cccccc",
+
+    # optional: prompt text
+    "prompt": "bold #00ffff",
+})
+
+
+
 # 'bg:#0000FF' is hex for blue.
 blue_background_style = Style.from_dict(
     {
@@ -69,12 +109,140 @@ blue_background_style = Style.from_dict(
 )
 
 
+# class CursesPresenter:
+#     def run(self, doc: DocstringPresentationModel) -> UserResponseModel:
+#         return curses.wrapper(self._main, doc)
+
+#     def _main(self, stdscr, doc):
+#         curses.curs_set(0)
+#         stdscr.keypad(True)
+
+#         state = UIState(doc=doc, edited_lines=doc.new_docstring.lines.copy())
+
+#         while state.running:
+#             stdscr.clear()
+#             self._render(stdscr, state)
+#             key = stdscr.getch()
+#             self._handle_input(key, state)
+
+#         return state.result
+
+#     def _render(self, stdscr, state: UIState):
+#         h, w = stdscr.getmaxyx()
+
+#         self._draw_header(stdscr, state, 0, w)
+#         self._draw_existing(stdscr, state, 3, h // 3, w)
+#         self._draw_generated(stdscr, state, h // 3 + 4, h // 3, w)
+#         self._draw_footer(stdscr, state, h - 2, w)
+
+#     def _draw_header(self, stdscr, state, y, w):
+#         doc = state.doc
+#         stdscr.addstr(y, 0, f"File: {doc.file_path}")
+#         stdscr.addstr(y+1, 0, f"Function: {doc.signature}")
+
+#     def _draw_header(self, stdscr, state, y, w):
+#         doc = state.doc
+#         stdscr.addstr(y, 0, f"File: {doc.file_path}")
+#         stdscr.addstr(y+1, 0, f"Function: {doc.signature}")
+
+#     def _handle_view_input(self, key, state):
+#         if key == ord('q'):
+#             state.result = UserResponseModel(None, UserResponse.QUIT)
+#             state.running = False
+
+#         elif key == ord('a'):
+#             state.doc.new_docstring.lines = state.edited_lines
+#             state.result = UserResponseModel(state.doc, UserResponse.ACCEPT)
+#             state.running = False
+
+#         elif key == ord('s'):
+#             state.result = UserResponseModel(state.doc, UserResponse.SKIP)
+#             state.running = False
+
+#         elif key == ord('e'):
+#             state.mode = Mode.EDIT
+
+#     def _handle_edit_input(self, key, state):
+#         y = state.cursor_y
+#         lines = state.edited_lines
+
+#         if key == 27:  # ESC
+#             state.mode = Mode.VIEW
+#             return
+
+#         elif key in (curses.KEY_UP, ord('k')):
+#             state.cursor_y = max(0, y - 1)
+
+#         elif key in (curses.KEY_DOWN, ord('j')):
+#             state.cursor_y = min(len(lines) - 1, y + 1)
+
+#         elif key in (curses.KEY_BACKSPACE, 127):
+#             if lines[y]:
+#                 lines[y] = lines[y][:-1]
+
+#         elif key == curses.KEY_ENTER or key == 10:
+#             lines.insert(y + 1, "")
+#             state.cursor_y += 1
+
+#         elif 32 <= key <= 126:  # printable chars
+#             lines[y] += chr(key)
+
+#     def _draw_generated(self, stdscr, state, start_y, height, width):
+#         for i in range(height):
+#             line_idx = i + state.scroll_offset
+#             if line_idx >= len(state.edited_lines):
+#                 break
+
+#             line = state.edited_lines[line_idx]
+
+#             if line_idx == state.cursor_y and state.mode == Mode.EDIT:
+#                 stdscr.attron(curses.A_REVERSE)
+#                 stdscr.addstr(start_y + i, 0, line[:width-1])
+#                 stdscr.attroff(curses.A_REVERSE)
+#             else:
+#                 stdscr.addstr(start_y + i, 0, line[:width-1])
+
+
 class Presenter:
     """Presenter class for user interaction and displaying information."""
 
     def __init__(self):
         self._console = Console()
+        self._session = self._create_session()
+    
 
+    def _create_session(self):
+        kb = KeyBindings()
+
+        @kb.add("a")
+        def _(event):
+            event.app.exit(result="a")
+
+        @kb.add("e")
+        def _(event):
+            event.app.exit(result="e")
+
+        @kb.add("s")
+        def _(event):
+            event.app.exit(result="s")
+
+        @kb.add("q")
+        def _(event):
+            event.app.exit(result="q")
+
+        style = Style.from_dict({
+            "bottom-toolbar": "bg:#222222 #cccccc",
+        })
+
+        def toolbar():
+            return "a: Accept | e: Edit | s: Skip | q: Quit"
+
+        return PromptSession(
+            key_bindings=kb,
+            style=style,
+            bottom_toolbar=toolbar,
+        )
+        
     def get_user_approval(self, doc: DocstringPresentationModel) -> UserResponseModel:
         """
         Gets user approval for the generated documentation.
@@ -93,27 +261,51 @@ class Presenter:
                 return UserResponseModel(doc_model=doc, response=UserResponse.SKIP)
             if response == USER_RESPONSES[UserResponse.EDIT]:
                 try:
-                    doc.new_docstring.lines = self.edit_text_with_editor(
+                    doc.new_docstring.lines = self.edit_text_inline(
                         doc.new_docstring.lines
                     )
                 except Exception as e:
                     logger.info(e)
                 continue
 
-    def edit_text_with_editor(self, initial_text: List[str]) -> List[str]:
+    def get_toolbar(self):
+        return (
+            " Ctrl+S: Accept | "
+            "Esc: Cancel | "
+            "Ctrl+C: Abort"
+        )
+    
+    def edit_text_inline(self, initial_text: List[str]) -> List[str] | None:
         """
         Opens the default text editor with the initial text for editing.
         """
-        editor = platform_utils.get_default_editor()
-        with tempfile.NamedTemporaryFile(suffix=".tmp", mode="w+", delete=False) as tf:
-            tf.writelines(initial_text)
-            tf.flush()
-            file_path = tf.name
+        kb = KeyBindings()
 
-        subprocess.call([editor, file_path])
+        @kb.add("c-s") 
+        def _(event):
+            event.app.exit(result=event.app.current_buffer.text)
 
-        with open(file_path, "r", encoding="utf-8") as tf:
-            return tf.readlines()
+        @kb.add("escape")
+        def _(event):
+            event.app.exit(result=None)
+            
+        session = PromptSession(
+            multiline=True,
+            style=docstring_style,
+            key_bindings=kb,
+            bottom_toolbar=self.get_toolbar,
+            editing_mode=EditingMode.VI
+        )
+
+        text = session.prompt(
+            message="Edit docstring:\n",
+            default="".join(initial_text),
+        )
+
+        if text is None:
+            return None
+
+        return text.splitlines(keepends=True)
 
     def print_error(self, message: str):
         """Prints an error message."""
@@ -227,7 +419,7 @@ class Presenter:
         answer = prompt(message=message, style=blue_background_style)
         return answer
 
-    def interact(self, doc: DocstringPresentationModel):
+    def interact(self, doc: DocstringPresentationModel) -> str:
         """
         Interacts with the user to accept, edit, skip, or quit the documentation generation.
         """
@@ -252,13 +444,14 @@ class Presenter:
             self._console.print("[grey69]Existing Docstring:")
             self._console.print(f"[pale_green1]{escape(current_lines.strip())}")
         self._console.print(Rule(style="grey69", title="Generated Docstring"))
-        formatted_doc = "".join(doc.new_docstring.lines).strip()
+        formatted_doc = "".join(doc.new_docstring.lines if doc.new_docstring.lines else [""]).strip()
         self._console.print(f"[green]{escape(formatted_doc)}")
         self._console.print(Rule(style="grey69"))
 
-        result = self.get_blue_prompt(
-            f"Accept ({ACCEPT}), Edit ({EDIT}), Skip ({SKIP}), Quit ({QUIT}): "
-        )
+        # result = self.get_blue_prompt(
+        #     f"Accept ({ACCEPT}), Edit ({EDIT}), Skip ({SKIP}), Quit ({QUIT}): "
+        # )
+        result = self._session.prompt("> ")
         self._console.clear()
         return result.strip().lower()
 
