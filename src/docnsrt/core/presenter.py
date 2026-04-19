@@ -180,9 +180,12 @@ class _PresenterApp:
         def _(event):
             if self.edit_mode:
                 text = self.editor.text
+                if not text.endswith("\n"):
+                    text += "\n"
+                    
                 lines = text.splitlines(keepends=True)
 
-                self.result = (ACCEPT, lines)
+                self.result = (EDIT, lines)
                 event.app.exit()
 
         root_container = HSplit(

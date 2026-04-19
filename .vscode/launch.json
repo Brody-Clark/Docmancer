@@ -12,8 +12,10 @@
             ],
             "cwd": "${workspaceFolder}/tests/test_projects/csharp",
             "console": "integratedTerminal",
+            "python": "${command:python.interpreterPath}",
             "justMyCode": false,
             "env": {
+                
             }
         },
          {
@@ -26,6 +28,7 @@
             ],
             "cwd": "${workspaceFolder}/tests/test_projects/python",
             "console": "integratedTerminal",
+            "python": "${command:python.interpreterPath}",
             "justMyCode": false,
             "env": {
             }
@@ -39,6 +42,7 @@
                 "${file}"
             ],
             "console": "integratedTerminal",
+            "python": "${command:python.interpreterPath}",
             "justMyCode": true
         },
         {
@@ -47,6 +51,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
+            "python": "${command:python.interpreterPath}",
             "justMyCode": true,
             "cwd": "${workspaceFolder}",
             "env": {

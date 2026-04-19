@@ -149,7 +149,7 @@ def parse_args() -> DocnsrtConfig:
         "-func",
         nargs="*",
         default=argparse.SUPPRESS,
-        help="Function names or glob patterns to match functions to within speficied files (e.g., calculate_*). Default is all functions.",
+        help="Function names or glob patterns to match functions to within specified files (e.g., calculate_*). Default is all functions.",
     )
     parser.add_argument(
         "--ignore-files",
@@ -161,7 +161,7 @@ def parse_args() -> DocnsrtConfig:
         "--ignore-functions",
         nargs="*",
         default=argparse.SUPPRESS,
-        help="Function names or glob patterns to skip within speficied files (e.g., _test_*)",
+        help="Function names or glob patterns to skip within specified files (e.g., _test_*)",
     )
     parser.add_argument(
         "--project-dir",
