@@ -182,7 +182,7 @@ class _PresenterApp:
                 text = self.editor.text
                 if not text.endswith("\n"):
                     text += "\n"
-                    
+
                 lines = text.splitlines(keepends=True)
 
                 self.result = (EDIT, lines)
