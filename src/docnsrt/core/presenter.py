@@ -19,6 +19,7 @@ from docnsrt.core.models import DocstringPresentationModel
 
 logger = logging.getLogger(__name__)
 
+
 class UserResponse(Enum):
     """
     Enumeration for user responses.
@@ -236,6 +237,9 @@ class _PresenterApp:
         return not self.edit_mode
 
     def run(self):
+        """
+        Runs the prompt toolkit app
+        """
         self.app.run()
         return self.result
 
@@ -246,7 +250,9 @@ class Presenter:
     def __init__(self):
         pass
 
-    def get_user_approval(self, doc: DocstringPresentationModel) -> UserResponseModel:
+    def get_user_approval(
+        self, doc: DocstringPresentationModel
+    ) -> UserResponseModel | None:
         """
         Gets user approval for the generated documentation.
         Args:
@@ -266,7 +272,7 @@ class Presenter:
         console = Console()
         console.print(f"[bold green]Success:[/bold green] {message}", style="green")
 
-    def interact(self, doc: DocstringPresentationModel) -> str:
+    def interact(self, doc: DocstringPresentationModel) -> UserResponseModel | None:
         """
         Interacts with the user to accept, edit, skip, or quit the documentation generation.
         """
@@ -282,3 +288,4 @@ class Presenter:
         if action == EDIT:
             doc.new_docstring.lines = text
             return UserResponseModel(doc_model=doc, response=UserResponse.ACCEPT)
+        return None

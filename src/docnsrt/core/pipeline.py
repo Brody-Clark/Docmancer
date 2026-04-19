@@ -209,6 +209,9 @@ class DocumentationPipeline:
         while docstring_models:
             doc = docstring_models.pop()
             approval_response = self._presenter.get_user_approval(doc)
+            if not approval_response:
+                logger.error("Failed to get response for docstring model")
+                continue
             if approval_response.response == UserResponse.QUIT:
                 return False, None
             if approval_response.response == UserResponse.SKIP:
