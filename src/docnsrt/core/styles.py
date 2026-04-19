@@ -25,7 +25,6 @@ class DocstringStyle(Enum):
 
 
 STYLE_DEFINITIONS: Dict[str, Dict[str, Any]] = {
-
     DocstringStyle.PEP.value: {
         "description": "PEP 257 docstring conventions (often reStructuredText-like)."
     },
