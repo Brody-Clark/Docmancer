@@ -11,6 +11,7 @@ class Languages(Enum):
 
     PYTHON = "python"
     CSHARP = "csharp"
+    JAVA = "java"
 
     def lower(self) -> str:
         """

@@ -38,4 +38,6 @@ class FormatterFactory:
         if language == Languages.CSHARP.value:
             if style.lower() == DocstringStyle.XML.lower():
                 return CSharpXmlFormatter()
+        if language == Languages.JAVA.value:
+                pass
         raise ValueError(f"Unsupported style '{style}' for language '{language}'")
